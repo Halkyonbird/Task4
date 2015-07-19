@@ -1,4 +1,4 @@
-//
+		//
 //  ViewController.h
 //  Task1
 //
@@ -7,9 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Desk.h"
+#import "CardMatchingGame.h"
 
 @interface ViewController : UIViewController
 
+@property (nonatomic, strong) CardMatchingGame *game;
+@property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *cardButtons;
+
+// !!! ask Rost more about public-private-protected in objective-c
+// protected
+// for subclasses
+
+- (Desk *)createDesk; // absract method
 
 @end
 

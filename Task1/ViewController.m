@@ -7,17 +7,18 @@
 //
 
 #import "ViewController.h"
-#import "PlayingCardDesk.h"
-#import "CardMatchingGame.h"
+//#import "PlayingCardDesk.h"
+//ash #import "CardMatchingGame.h"
 
 @interface ViewController ()
 
-@property (nonatomic, strong) CardMatchingGame *game;
-@property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *cardButtons;
+//ash @property (nonatomic, strong) CardMatchingGame *game;
+//ash @property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *cardButtons;
+
 @property (weak, nonatomic) IBOutlet UILabel *scoreLabel;
 
 @property (weak, nonatomic) IBOutlet UILabel *numberOfMatchesLabel;
-- (NSString *)titleForCard:(Card *) card;
+- (NSAttributedString *)titleForCard:(Card *) card;
 - (UIImage *)backgroundImageForCard:(Card *) card;
 
 @property (weak, nonatomic) IBOutlet UIStepper *numberOfMatchesStepper; 
@@ -50,7 +51,7 @@
 
 - (Desk *)createDesk
 {
-    return [[PlayingCardDesk alloc] init];
+    return nil; // absract method
 }
 
 - (IBAction)touchButton:(UIButton *)sender {
@@ -65,17 +66,16 @@
     for (UIButton *cardButton in self.cardButtons) {
         NSUInteger cardButtonIndex = [self.cardButtons indexOfObject:cardButton];
         Card *card = [self.game cardAtIndex:cardButtonIndex];
-        [cardButton setTitle: [self titleForCard:card]  forState:UIControlStateNormal];
+        [cardButton setAttributedTitle:[self titleForCard:card]  forState:UIControlStateNormal];
         [cardButton setBackgroundImage:[self backgroundImageForCard:card]  forState:UIControlStateNormal];
         cardButton.enabled = !card.isMatched;
         self.scoreLabel.text = [NSString stringWithFormat: @"Score: %d",self.game.score];
-
     } 
 }
 
-- (NSString *)titleForCard: (Card *) card
+- (NSAttributedString *)titleForCard: (Card *) card
 {
-    return card.isChosen ? card.contents : @"";
+    return [[NSMutableAttributedString alloc] initWithString:card.isChosen ? card.contents : @""];
 }
 
 - (UIImage *)backgroundImageForCard:(Card *)card
