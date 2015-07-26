@@ -8,6 +8,8 @@
 
 #import "PlayingCardGameViewController.h"
 #import "PlayingCardDesk.h"
+#import "PlayingCard.h"
+
 
 @interface PlayingCardGameViewController ()
 
@@ -20,6 +22,22 @@
     return [[PlayingCardDesk alloc] init];  
 }
 
+- (NSAttributedString *)titleForCard: (Card *) card
+{
+    // !!! Задать вопрос Росту - можно было бы вызвать метод суперкласса, но пришлось бы делать его public?
+    NSString *content = card.isChosen ? card.contents : @"";
+    BOOL isRedCard = [card.contents containsString:@"♦︎"] || [card.contents containsString:@"♥︎"];
+    UIColor *cardColor = isRedCard ? [UIColor redColor] : [UIColor blackColor];
+    NSMutableAttributedString *resultAttributedString = [[NSMutableAttributedString alloc] initWithString:content attributes:@{NSForegroundColorAttributeName: cardColor}] ;
+    return resultAttributedString;
+}
+
+- (void) setContentForCardView: (CardView *) cardView withCard: (PlayingCard *) card {
+    cardView.rank = card.rank;
+    cardView.suit = [[NSMutableAttributedString alloc] initWithString:card.suit];
+    [cardView setNeedsDisplay];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -28,16 +46,6 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-- (NSAttributedString *)titleForCard: (Card *) card
-{
-    NSString *content = card.isChosen ? card.contents : @"";
-    NSMutableAttributedString *resultAttributedString = [[NSMutableAttributedString alloc] initWithString:content attributes:@{NSForegroundColorAttributeName: [UIColor redColor]}] ;
-    //[[NSMutableAttributedString alloc] initWithString:content]];
-    
-    //return card.isChosen ? card.contents : @"";
-    return resultAttributedString;
 }
 
 /*

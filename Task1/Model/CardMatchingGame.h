@@ -17,6 +17,7 @@
 - (Card *)cardAtIndex:(NSUInteger)index;
 
 @property (nonatomic, readonly) NSInteger score;
-@property (nonatomic) NSUInteger numberOfMatches;
+@property (nonatomic) NSUInteger cardsNumberForCompare;
+@property (nonatomic) NSUInteger stageNumber;
 
 @end

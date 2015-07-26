@@ -33,7 +33,8 @@ static const int COST_TO_CHOOSE = 1;
 {
     self = [super init];
     // ash
-    self.numberOfMatches = 2;
+    self.cardsNumberForCompare = 2;
+    self.stageNumber = 0;
     if (self) {
         for(int i=0; i<=count; i++) {
             Card *card = [desk drawRandomCard];
@@ -64,7 +65,7 @@ static const int COST_TO_CHOOSE = 1;
             
 // -------   version 1  begin ----------- (uncomment following code for activating version 1)
 // in this version last chosen card flips back
-/*
+
             card.chosen = YES;
             NSMutableArray *chosenCards = [NSMutableArray array]; //array for chosen cards
             int chosenCardsNumber = 1;
@@ -75,7 +76,7 @@ static const int COST_TO_CHOOSE = 1;
                 if (otherCard.isChosen && !otherCard.isMatched) {
                     [chosenCards addObject:otherCard];
                     chosenCardsNumber++;
-                    if (chosenCardsNumber == self.numberOfMatches) { // achieved necessary number of chosen cards
+                    if (chosenCardsNumber == self.cardsNumberForCompare) { // achieved necessary number of chosen cards
                         int matchScore = [card match:chosenCards];
                         if (matchScore) {
                             self.score += matchScore * MATCH_BONUS;
@@ -90,26 +91,27 @@ static const int COST_TO_CHOOSE = 1;
                             for (Card *curCard in chosenCards)
                                 curCard.chosen = NO;
                         }
+                        self.stageNumber++;
                         break;
                     }
                 }
             }
             self.score -= COST_TO_CHOOSE;
-*/
+
 // -------   version 1  end -----------
            
          
 
 // -------   version 2  begin ----------- (comment following code for activating version 1)
 // in this version last chosen card stays open and will be first at next choose cycle
-
+/*
             NSMutableArray *chosenCards = [NSMutableArray array]; //array for chosen cards
             int chosenCardsNumber = 1;
             for (Card *otherCard in self.cards) {
                 if (otherCard.isChosen && !otherCard.isMatched) {
                     [chosenCards addObject:otherCard];
                     chosenCardsNumber++;
-                    if (chosenCardsNumber == self.numberOfMatches) { // achieved necessary number of chosen cards
+                    if (chosenCardsNumber == self.cardsNumberForCompare) { // achieved necessary number of chosen cards
                         int matchScore = [card match:chosenCards];
                         if (matchScore) {
                             self.score += matchScore * MATCH_BONUS;
@@ -129,7 +131,7 @@ static const int COST_TO_CHOOSE = 1;
             }
             self.score -= COST_TO_CHOOSE;
             card.chosen = YES;
- 
+*/
 // -------   version 2  end -----------
             
         }
