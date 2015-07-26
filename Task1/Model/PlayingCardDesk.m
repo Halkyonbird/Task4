@@ -13,7 +13,6 @@
 @implementation PlayingCardDesk
 
 - (instancetype)init {
-    
     self = [super init];
     if (self) {
         for (NSString *suit in [PlayingCard validSuits]){
@@ -27,4 +26,5 @@
     }
     return  self;
 }
+
 @end

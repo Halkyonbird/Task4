@@ -34,13 +34,12 @@
 }
 
 - (void)setSuit:(NSString *)suit {
-    if ([[PlayingCard validSuits] containsObject:suit])  {
+    if ([[PlayingCard validSuits] containsObject:suit]) {
         _suit = suit;
     }
 }
 
-- (int)match:(NSArray *)otherCards
-{
+- (int)match:(NSArray *)otherCards {
     int score = 0;
     int numOtherCards = [otherCards count];
     

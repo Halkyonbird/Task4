@@ -27,7 +27,6 @@
 }
 
 - (Card *)drawRandomCard {
-
     Card * drawnCard = nil;
     if ([self.cards count]) {
         unsigned int index = arc4random() % [self.cards count];
