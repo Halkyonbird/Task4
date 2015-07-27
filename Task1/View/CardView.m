@@ -10,22 +10,19 @@
 #import "ViewController.h"
 #import "PlayingCard.h"
 
-@interface CardView()
-//- (void)tap:(UITapGestureRecognizer *)gesture fromCard:(id<PlayingCardView>) sender;
-@end
-
 @implementation CardView
 @synthesize rank;
 @synthesize suit;
 
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
+#define HORIZONT_OFFSET 0.03
+#define VERTICAL_OFFSET 0.08
+#define FONT_SIZE 10.0
+
 - (void)drawRect:(CGRect)rect {
     [self setOpaque];
-    UIBezierPath *roundedRect = [UIBezierPath bezierPathWithRoundedRect:self.bounds cornerRadius:	3.0];
+    UIBezierPath *roundedRect = [UIBezierPath bezierPathWithRoundedRect:self.bounds cornerRadius:3.0];
     [roundedRect addClip];
     UIColor *backColor, *strokeColor;
-    //UIColor *backColor = self.isDisabled ? [UIColor lightGrayColor] : [UIColor whiteColor];
     if (self.isDisabled) {
         backColor = [UIColor lightGrayColor];
         strokeColor = [UIColor grayColor];
@@ -33,23 +30,27 @@
         backColor = [UIColor whiteColor];
         strokeColor = [UIColor blackColor];
     }
-        
     [backColor setFill];
     [roundedRect fill];
-    NSMutableAttributedString * attrStringSuit = [[NSMutableAttributedString alloc] initWithAttributedString:self.suit];
-    NSMutableAttributedString * attrCardText = [[NSMutableAttributedString alloc] initWithString:[[PlayingCard rankStrings] objectAtIndex:self.rank]];
-    [attrCardText appendAttributedString:attrStringSuit];
-    if (self.isOpen) {
-        BOOL isRedCard = [[self.suit string] containsString:@"♦︎"] || [[self.suit string] containsString:@"♥︎"]; // || [card.contents containsString:@"♥︎"];
+    NSMutableAttributedString * attrSuitText = [[NSMutableAttributedString alloc] initWithAttributedString:self.suit];
+    NSMutableAttributedString * attrCornerText = [[NSMutableAttributedString alloc] initWithString:[[PlayingCard rankStrings] objectAtIndex:self.rank]];
+    [attrCornerText appendAttributedString:attrSuitText];
+    if (self.isOpen) { // draw front of the card
+        BOOL isRedCard = [[self.suit string] containsString:@"♦︎"] || [[self.suit string] containsString:@"♥︎"];
         UIColor *fontColor = isRedCard ? [UIColor redColor] : [UIColor blackColor];
-        [attrCardText addAttributes:@{NSForegroundColorAttributeName:fontColor} range:NSMakeRange(0, [attrCardText length])];
+        
+        // draw attrSuitText at the central position of our view
+        [attrSuitText addAttributes:@{NSForegroundColorAttributeName:fontColor, NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleHeadline]} range:NSMakeRange(0, [attrSuitText length])];
+        CGSize textSize = [attrSuitText size];
+        [attrSuitText drawAtPoint:CGPointMake(self.bounds.size.width/2 - textSize.width/2, self.bounds.size.height/2 - textSize.height/2)];
 
-        CGSize textSize = [attrCardText size];
-        [attrCardText drawAtPoint:CGPointMake(self.bounds.size.width/2 - textSize.width/2, self.bounds.size.height/2 - textSize.height/2)];
-        [self setOpaque];
-    } else {
-        //CGRect imageRect = CGRectInset(self.bounds,                                       self.bounds.size.width * 0.1,                                       self.bounds.size.height * 0.1);
-        //[[UIImage imageNamed:@"cardBack"] drawInRect:imageRect];
+        // draw attrCornerText at the corner positions of our view
+        [attrCornerText addAttributes:@{NSForegroundColorAttributeName:fontColor, NSFontAttributeName:[UIFont fontWithName:@"Arial" size:FONT_SIZE]} range:NSMakeRange(0, [attrCornerText length])];
+        textSize = [attrCornerText size];
+        [attrCornerText drawAtPoint:CGPointMake(self.bounds.size.width * VERTICAL_OFFSET, self.bounds.size.height * HORIZONT_OFFSET)];
+        [attrCornerText drawAtPoint:CGPointMake(self.bounds.size.width - textSize.width - self.bounds.size.width * VERTICAL_OFFSET, self.bounds.size.height - textSize.height - self.bounds.size.height * HORIZONT_OFFSET)];
+                                   
+    } else { // draw back of the card
         [[UIImage imageNamed:@"cardBack"] drawInRect:self.bounds];
     }
     [strokeColor setStroke];
@@ -60,10 +61,8 @@
 
 - (void)setOpaque
 {
-    //self.backgroundColor = nil;
     self.backgroundColor = [UIColor clearColor];
     self.opaque = NO;
-    //self.contentMode = UIViewContentModeRedraw;
 }
 
 - (void)awakeFromNib

@@ -16,7 +16,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="3" minimumValue="2" maximumValue="6" translatesAutoresizingMaskIntoConstraints="NO" id="Ulq-A4-NrQ">
+                            <stepper contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="3" minimumValue="2" maximumValue="6" translatesAutoresizingMaskIntoConstraints="NO" id="Ulq-A4-NrQ">
                                 <rect key="frame" x="210" y="28" width="94" height="29"/>
                                 <color key="backgroundColor" white="0.78482216282894746" alpha="1" colorSpace="calibratedWhite"/>
                                 <color key="tintColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>

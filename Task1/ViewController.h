@@ -13,9 +13,6 @@
 
 @interface ViewController : UIViewController
 
-//@property (nonatomic, strong) CardMatchingGame *game;
-
-// !!! ask Rost more about public-private-protected in objective-c
 // protected
 // for subclasses
 
