@@ -64,17 +64,19 @@
     int chosenButtonIndex = [self.cardViews indexOfObject:gesture.view];
     //NSLog(@"Hello from View with Index: %d", chosenButtonIndex);
     [self.game chooseCardAtIndex:chosenButtonIndex];
-    self.cardsNumberForCompareStepper.enabled = NO; // disable stepper after game starting
-    [self updateUI];
+    self.cardsNumberForCompareStepper.enabled = NO; // disable stepper after game starting   
+    [UIView transitionWithView:gesture.view duration:0.5 options:UIViewAnimationOptionTransitionFlipFromLeft animations:^{ [self updateUI]; }
+        completion:^(BOOL finished) { NSLog(@"Completed qqq!"); }];
 }
 
 - (void)updateUI {
-    
+   
     for (CardView *cardView in self.cardViews) {
         NSUInteger cardButtonIndex = [self.cardViews indexOfObject:cardView];
         Card *card = [self.game cardAtIndex:cardButtonIndex];
         cardView.isOpen = card.isChosen;
-        cardView.isDisabled = card.isMatched;        
+        cardView.isDisabled = card.isMatched;
+        
         [self setContentForCardView:cardView withCard:card]; // call method of child for adding playing card properties (rank, suit) to the cardView
         [cardView setNeedsDisplay];
         self.scoreLabel.text = [NSString stringWithFormat: @"Current score: %d",self.game.score];
