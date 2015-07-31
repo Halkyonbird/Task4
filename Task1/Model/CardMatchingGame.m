@@ -21,16 +21,14 @@ static const int MISMATCH_PENALTY = 2;
 static const int MATCH_BONUS = 4;
 static const int COST_TO_CHOOSE = 1;
 
-- (NSMutableArray *)cards
-{
+- (NSMutableArray *)cards {
     if (!_cards) {
         _cards = [[NSMutableArray alloc] init];
     }
     return  _cards;
 }
 
-- (instancetype)initWithCardCount:(NSUInteger)count usingDesk:(Desk *)desk
-{
+- (instancetype)initWithCardCount:(NSUInteger)count usingDesk:(Desk *)desk {
     self = [super init];
     // ash
     self.cardsNumberForCompare = 2;
@@ -49,90 +47,81 @@ static const int COST_TO_CHOOSE = 1;
     return self;
 }
 
-- (Card *)cardAtIndex:(NSUInteger)index
-{
+- (Card *)cardAtIndex:(NSUInteger)index {
     return (index<[self.cards count]) ? self.cards[index]: nil ;
 }
 
--(void)chooseCardAtIndex:(NSUInteger)index
-{
+- (void)chooseCardAtIndex:(NSUInteger)index {
     Card *card = [self cardAtIndex:index];
     if (!card.isMatched) {
         if (card.isChosen) {
             card.chosen = NO;
         } else {
             
-// -------   version 1  begin ----------- (uncomment following code for activating version 1)
-// in this version last chosen card flips back
-
-            card.chosen = YES;
-            NSMutableArray *chosenCards = [NSMutableArray array]; //array for chosen cards
-            int chosenCardsNumber = 1;
-            NSMutableArray *otherCards = [self.cards mutableCopy];
-            [otherCards removeObjectAtIndex:index]; // all array without current chosen card
-
-            for (Card *otherCard in otherCards) {
-                if (otherCard.isChosen && !otherCard.isMatched) {
-                    [chosenCards addObject:otherCard];
-                    chosenCardsNumber++;
-                    if (chosenCardsNumber == self.cardsNumberForCompare) { // achieved necessary number of chosen cards
-                        int matchScore = [card match:chosenCards];
-                        if (matchScore) {
-                            self.score += matchScore * MATCH_BONUS;
-                            //otherCard.matched = YES;
-                            card.matched = YES;
-                            for (Card *curCard in chosenCards)
-                                curCard.matched = YES;
-                            
-                        } else {
-                            self.score -= MISMATCH_PENALTY;
-                            card.chosen = NO;
-                            for (Card *curCard in chosenCards)
-                                curCard.chosen = NO;
-                        }
-                        self.stageNumber++;
-                        break;
-                    }
-                }
-            }
-            self.score -= COST_TO_CHOOSE;
-
-// -------   version 1  end -----------
-           
-         
-
-// -------   version 2  begin ----------- (comment following code for activating version 1)
-// in this version last chosen card stays open and will be first at next choose cycle
-/*
-            NSMutableArray *chosenCards = [NSMutableArray array]; //array for chosen cards
-            int chosenCardsNumber = 1;
-            for (Card *otherCard in self.cards) {
-                if (otherCard.isChosen && !otherCard.isMatched) {
-                    [chosenCards addObject:otherCard];
-                    chosenCardsNumber++;
-                    if (chosenCardsNumber == self.cardsNumberForCompare) { // achieved necessary number of chosen cards
-                        int matchScore = [card match:chosenCards];
-                        if (matchScore) {
-                            self.score += matchScore * MATCH_BONUS;
-                            //otherCard.matched = YES;
-                            card.matched = YES;
-                            for (Card *curCard in chosenCards)
-                                curCard.matched = YES;
-                        } else {
-                            self.score -= MISMATCH_PENALTY;
-                            card.chosen = NO;
-                            for (Card *curCard in chosenCards)
-                                curCard.chosen = NO;
-                        }
-                        break;
-                    }
-                }
-            }
-            self.score -= COST_TO_CHOOSE;
-            card.chosen = YES;
-*/
-// -------   version 2  end -----------
+            //#define LAST_CARD_IS_NOT_OPEN
+            #ifdef LAST_CARD_IS_NOT_OPEN     // in this version last chosen card flips back
             
+                card.chosen = YES;
+                NSMutableArray *chosenCards = [NSMutableArray array]; //array for chosen cards
+                int chosenCardsNumber = 1;
+                NSMutableArray *otherCards = [self.cards mutableCopy];
+                [otherCards removeObjectAtIndex:index]; // all array without current chosen card
+                for (Card *otherCard in otherCards) {
+                    if (otherCard.isChosen && !otherCard.isMatched) {
+                        [chosenCards addObject:otherCard];
+                        chosenCardsNumber++;
+                        if (chosenCardsNumber == self.cardsNumberForCompare) { // achieved necessary number of chosen cards
+                            int matchScore = [card match:chosenCards];
+                            if (matchScore) {
+                                self.score += matchScore * MATCH_BONUS;
+                                //otherCard.matched = YES;
+                                card.matched = YES;
+                                for (Card *curCard in chosenCards)
+                                    curCard.matched = YES;
+                            } else {
+                                self.score -= MISMATCH_PENALTY;
+                                card.chosen = NO;
+                                for (Card *curCard in chosenCards)
+                                    curCard.chosen = NO;
+                            }
+                            self.stageNumber++;
+                            break;
+                        }
+                    }
+                }
+                self.score -= COST_TO_CHOOSE;
+      
+            #else       // in this version last chosen card stays open and will be first at next choose cycle
+            
+                NSMutableArray *chosenCards = [NSMutableArray array]; //array for chosen cards
+                int chosenCardsNumber = 1;
+                for (Card *otherCard in self.cards) {
+                    if (otherCard.isChosen && !otherCard.isMatched) {
+                        [chosenCards addObject:otherCard];
+                        chosenCardsNumber++;
+                        if (chosenCardsNumber == self.cardsNumberForCompare) { // achieved necessary number of chosen cards
+                            int matchScore = [card match:chosenCards];
+                            if (matchScore) {
+                                self.score += matchScore * MATCH_BONUS;
+                                //otherCard.matched = YES;
+                                card.matched = YES;
+                                for (Card *curCard in chosenCards)
+                                    curCard.matched = YES;
+                            } else {
+                                self.score -= MISMATCH_PENALTY;
+                                card.chosen = NO;
+                                for (Card *curCard in chosenCards)
+                                    curCard.chosen = NO;
+                            }
+                            self.stageNumber++;
+                            break;
+                        }
+                    }
+                }
+                self.score -= COST_TO_CHOOSE;
+                card.chosen = YES;
+
+            #endif
         }
     }
 }

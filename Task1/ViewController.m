@@ -35,8 +35,7 @@
     self.cardsNumberForCompareLabel.text = [NSString stringWithFormat:@"Number of matches: %d", self.game.cardsNumberForCompare];
 }
 
-- (CardMatchingGame *)game
-{
+- (CardMatchingGame *)game {
     if (!_game) {
         _game = [[CardMatchingGame alloc] initWithCardCount:[self.cardViews count]
                                                   usingDesk:[self createDesk]];
@@ -52,21 +51,25 @@
     self.currentStageNumber = self.game.stageNumber;
     self.historySlider.maximumValue = self.currentStageNumber;
     self.resultHistory = nil;
+    [self cardsAlphaIncreasing];
     [self updateUI];
+    NSLog(@"view: %@ %d %@", self.view, [self.view.subviews count], self.scoreLabel.superview );
 }
 
-- (Desk *)createDesk
-{
+- (Desk *)createDesk {
     return nil; // absract method
 }
 
 - (void)tapCard:(UITapGestureRecognizer *)gesture {
-    int chosenButtonIndex = [self.cardViews indexOfObject:gesture.view];
-    //NSLog(@"Hello from View with Index: %d", chosenButtonIndex);
-    [self.game chooseCardAtIndex:chosenButtonIndex];
+    int chosenCardIndex = [self.cardViews indexOfObject:gesture.view];
+    CardView *card = self.cardViews[chosenCardIndex];
+    if (card.isDisabled  ) {
+        return;
+    }
+    [self.game chooseCardAtIndex:chosenCardIndex];
     self.cardsNumberForCompareStepper.enabled = NO; // disable stepper after game starting   
-    [UIView transitionWithView:gesture.view duration:0.5 options:UIViewAnimationOptionTransitionFlipFromLeft animations:^{ [self updateUI]; }
-        completion:^(BOOL finished) { NSLog(@"Completed qqq!"); }];
+    [UIView transitionWithView:gesture.view duration:0.4 options:UIViewAnimationOptionTransitionFlipFromLeft animations:^{ [self updateUI]; }
+        completion:^(BOOL finished) { ; }];
 }
 
 - (void)updateUI {
@@ -76,9 +79,7 @@
         Card *card = [self.game cardAtIndex:cardButtonIndex];
         cardView.isOpen = card.isChosen;
         cardView.isDisabled = card.isMatched;
-        
         [self setContentForCardView:cardView withCard:card]; // call method of child for adding playing card properties (rank, suit) to the cardView
-        [cardView setNeedsDisplay];
         self.scoreLabel.text = [NSString stringWithFormat: @"Current score: %d",self.game.score];
     }
     if (self.game.stageNumber > self.currentStageNumber) { // Catch increasing of stageNumber (after every matching)
@@ -93,6 +94,16 @@
 
 - (void) setContentForCardView: (CardView *) cardView withCard: (Card *) card { //abstract
 //abstract
+}
+
+- (void) cardsAlphaIncreasing {
+    for (CardView *cardView in self.cardViews) {
+        cardView.alpha = 0;
+        [UIView animateWithDuration:2.0 animations:^{
+            for (CardView *cardView in self.cardViews) {
+                cardView.alpha = 1;
+            }; }];
+    }
 }
 
 #pragma mark - Preferred fonts
@@ -123,6 +134,7 @@
     //[self setPreferredFonts];
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferredFontSizeWasChanged:)                                                 name:UIContentSizeCategoryDidChangeNotification object:nil];
+    [self cardsAlphaIncreasing];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

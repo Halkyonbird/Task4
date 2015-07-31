@@ -17,12 +17,11 @@
 
 @implementation PlayingCardGameViewController
 
-- (Desk *)createDesk
-{
+- (Desk *)createDesk {
     return [[PlayingCardDesk alloc] init];  
 }
 
-- (void) setContentForCardView: (id <PlayingCardView> *) cardView withCard: (PlayingCard *) card {
+- (void) setContentForCardView: (id <PlayingCardView> ) cardView withCard: (PlayingCard *) card {
     cardView.rank = card.rank;
     cardView.suit = [[NSMutableAttributedString alloc] initWithString:card.suit];
 }
