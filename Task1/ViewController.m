@@ -51,7 +51,7 @@
     self.currentStageNumber = self.game.stageNumber;
     self.historySlider.maximumValue = self.currentStageNumber;
     self.resultHistory = nil;
-    [self cardsAlphaIncreasing];
+    [self cardsStartAnimation];
     [self updateUI];
     NSLog(@"view: %@ %d %@", self.view, [self.view.subviews count], self.scoreLabel.superview );
 }
@@ -96,13 +96,19 @@
 //abstract
 }
 
-- (void) cardsAlphaIncreasing {
+- (void) cardsStartAnimation {
     for (CardView *cardView in self.cardViews) {
-        cardView.alpha = 0;
-        [UIView animateWithDuration:2.0 animations:^{
-            for (CardView *cardView in self.cardViews) {
-                cardView.alpha = 1;
-            }; }];
+        CGRect frame = cardView.frame;
+        CGRect startFrame = cardView.frame;
+        startFrame.origin.x = self.view.center.x - frame.size.width/2;
+        startFrame.origin.y = self.view.center.y - frame.size.height/2;
+     
+        [UIView animateWithDuration:1.5 animations:^{
+            cardView.frame = startFrame;
+        }];
+        [UIView animateWithDuration:1.5 delay:1.5 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+            cardView.frame = frame;
+        } completion:^(BOOL finished) { NULL; }];
     }
 }
 
@@ -134,7 +140,7 @@
     //[self setPreferredFonts];
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferredFontSizeWasChanged:)                                                 name:UIContentSizeCategoryDidChangeNotification object:nil];
-    [self cardsAlphaIncreasing];
+    [self cardsStartAnimation];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
