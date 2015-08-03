@@ -19,5 +19,6 @@
 
 @property (nonatomic) BOOL isOpen;
 @property (nonatomic) BOOL isDisabled;
+@property (nonatomic) CGRect startFrame;
 
 @end

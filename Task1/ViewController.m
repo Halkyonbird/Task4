@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-//ash #import "CardView.h"
+#import "FallBehavior.h"
 
 @interface ViewController ()
 
@@ -21,6 +21,8 @@
 @property (weak, nonatomic) IBOutlet UISlider *historySlider;
 @property (strong, nonatomic) NSMutableArray *resultHistory;
 @property NSUInteger currentStageNumber;
+@property (strong, nonatomic) UIDynamicAnimator *animator;
+@property (strong, nonatomic) FallBehavior *fallBehavior;
 
 - (void)tapCard:(UITapGestureRecognizer *)gesture;
 
@@ -29,6 +31,22 @@
 @implementation ViewController
 
 #pragma mark - Game control
+
+- (UIDynamicAnimator *)animator {
+    if (!_animator) {
+        _animator = [[UIDynamicAnimator alloc] initWithReferenceView:self.view];
+        //_animator.delegate = self;
+    }
+    return _animator;
+}
+
+- (FallBehavior *)fallBehavior {
+    if (!_fallBehavior) {
+        _fallBehavior = [[FallBehavior alloc] init];
+        [self.animator addBehavior:_fallBehavior];
+    }
+    return _fallBehavior;
+}
 
 - (IBAction)cardsNumberForCompareChanged:(UIStepper *)sender {
     self.game.cardsNumberForCompare = (NSUInteger) sender.value;
@@ -51,8 +69,9 @@
     self.currentStageNumber = self.game.stageNumber;
     self.historySlider.maximumValue = self.currentStageNumber;
     self.resultHistory = nil;
-    [self cardsStartAnimation];
+    [self cardsStartGameAnimation];
     [self updateUI];
+    //[self cardsEndGameAnimation];
     NSLog(@"view: %@ %d %@", self.view, [self.view.subviews count], self.scoreLabel.superview );
 }
 
@@ -73,15 +92,19 @@
 }
 
 - (void)updateUI {
-   
+    int chosenCardsCount = 0;
+    int matchedCardCount = 0;
+    static int lastMatching = 0;
     for (CardView *cardView in self.cardViews) {
         NSUInteger cardButtonIndex = [self.cardViews indexOfObject:cardView];
         Card *card = [self.game cardAtIndex:cardButtonIndex];
         cardView.isOpen = card.isChosen;
         cardView.isDisabled = card.isMatched;
+        if (cardView.isOpen) {chosenCardsCount++;}
+        if (cardView.isDisabled) {matchedCardCount++;}
         [self setContentForCardView:cardView withCard:card]; // call method of child for adding playing card properties (rank, suit) to the cardView
-        self.scoreLabel.text = [NSString stringWithFormat: @"Current score: %d",self.game.score];
     }
+        self.scoreLabel.text = [NSString stringWithFormat: @"Current score: %d",self.game.score];
     if (self.game.stageNumber > self.currentStageNumber) { // Catch increasing of stageNumber (after every matching)
         self.currentStageNumber = self.game.stageNumber;
         NSString *resultString = [NSString stringWithFormat:@"For matching %@ the score is %d", @(self.game.stageNumber), self.game.score];
@@ -90,19 +113,32 @@
         self.historySlider.maximumValue = self.currentStageNumber;
         [self.historySlider setValue:(float)self.currentStageNumber animated:YES];
     }
+    if (chosenCardsCount == [self.cardViews count]-1) {
+        lastMatching = 1;
+    }
+    if ( matchedCardCount == [self.cardViews count]) {
+        self.historyLabel.text = [NSString stringWithFormat:@"YOU WIN! Your score is %d", self.game.score];
+        lastMatching = 0;
+        [self cardsEndGameAnimation];
+    } else if ((chosenCardsCount == [self.cardViews count]+1 - self.game.cardsNumberForCompare) && lastMatching) {
+        self.historyLabel.text = [NSString stringWithFormat:@"You lost! Your score is %d", self.game.score];
+        lastMatching = 0;
+        [self cardsEndGameAnimation];
+    }
+
 }
+
 
 - (void) setContentForCardView: (CardView *) cardView withCard: (Card *) card { //abstract
 //abstract
 }
 
-- (void) cardsStartAnimation {
+- (void) cardsStartGameAnimation {
     for (CardView *cardView in self.cardViews) {
         CGRect frame = cardView.frame;
         CGRect startFrame = cardView.frame;
         startFrame.origin.x = self.view.center.x - frame.size.width/2;
         startFrame.origin.y = self.view.center.y - frame.size.height/2;
-     
         [UIView animateWithDuration:1.5 animations:^{
             cardView.frame = startFrame;
         }];
@@ -112,6 +148,17 @@
     }
 }
 
+- (void) cardsEndGameAnimation {
+    for (CardView *cardView in self.cardViews) {
+        CGRect frame = cardView.frame;
+        CGRect startFrame = cardView.frame;
+        startFrame.origin.x = self.view.center.x - frame.size.width/2;
+        startFrame.origin.y = self.view.center.y - frame.size.height/2;
+        
+        [self.fallBehavior addItem:cardView];
+        
+    }
+}
 #pragma mark - Preferred fonts
 
 - (void)preferredFontSizeWasChanged:(NSNotification *)notification {
@@ -140,7 +187,7 @@
     //[self setPreferredFonts];
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferredFontSizeWasChanged:)                                                 name:UIContentSizeCategoryDidChangeNotification object:nil];
-    [self cardsStartAnimation];
+    [self cardsStartGameAnimation];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -154,6 +201,7 @@
     self.cardsNumberForCompareLabel.text = [NSString stringWithFormat:@"Number of matches: %d", (NSUInteger) self.cardsNumberForCompareStepper.value];
     for (CardView *cardView in self.cardViews) { // add GestureRecognizer to every cardView with target in this controller
         [cardView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapCard:)]];
+        cardView.startFrame = cardView.bounds;
     }
 }
 
