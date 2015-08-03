@@ -128,35 +128,29 @@
 
 }
 
-
 - (void) setContentForCardView: (CardView *) cardView withCard: (Card *) card { //abstract
 //abstract
 }
 
 - (void) cardsStartGameAnimation {
     for (CardView *cardView in self.cardViews) {
-        CGRect frame = cardView.frame;
-        CGRect startFrame = cardView.frame;
-        startFrame.origin.x = self.view.center.x - frame.size.width/2;
-        startFrame.origin.y = self.view.center.y - frame.size.height/2;
+        [self.fallBehavior removeItem:cardView];
+        //CGRect frame = cardView.frame;
+        CGRect centerFrame = cardView.frame;
+        centerFrame.origin.x = self.view.center.x - centerFrame.size.width/2;
+        centerFrame.origin.y = self.view.center.y - centerFrame.size.height/2;
         [UIView animateWithDuration:1.5 animations:^{
-            cardView.frame = startFrame;
+            cardView.frame = centerFrame;
         }];
         [UIView animateWithDuration:1.5 delay:1.5 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-            cardView.frame = frame;
+            cardView.frame = cardView.startFrame;
         } completion:^(BOOL finished) { NULL; }];
     }
 }
 
 - (void) cardsEndGameAnimation {
     for (CardView *cardView in self.cardViews) {
-        CGRect frame = cardView.frame;
-        CGRect startFrame = cardView.frame;
-        startFrame.origin.x = self.view.center.x - frame.size.width/2;
-        startFrame.origin.y = self.view.center.y - frame.size.height/2;
-        
         [self.fallBehavior addItem:cardView];
-        
     }
 }
 #pragma mark - Preferred fonts
@@ -179,6 +173,7 @@
     if (selectedIndex >=0 && (selectedIndex <= self.currentStageNumber-1) && [self.resultHistory count]) {
         self.historyLabel.text = self.resultHistory[selectedIndex];
     }
+        [self cardsEndGameAnimation];
 }
 
 #pragma mark - System
@@ -201,7 +196,7 @@
     self.cardsNumberForCompareLabel.text = [NSString stringWithFormat:@"Number of matches: %d", (NSUInteger) self.cardsNumberForCompareStepper.value];
     for (CardView *cardView in self.cardViews) { // add GestureRecognizer to every cardView with target in this controller
         [cardView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapCard:)]];
-        cardView.startFrame = cardView.bounds;
+        //cardView.startFrame = cardView.frame;
     }
 }
 

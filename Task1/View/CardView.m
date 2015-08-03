@@ -88,6 +88,7 @@ static float FONT_SIZE = 10.0;
 
 - (void)awakeFromNib {
     [self setOpaque];
+    self.startFrame = self.frame;
 }
 
 @end

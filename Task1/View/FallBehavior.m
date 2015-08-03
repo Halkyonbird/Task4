@@ -58,6 +58,10 @@
         _animationOptions = [[UIDynamicItemBehavior alloc] init];
         _animationOptions.allowsRotation = YES;
         _animationOptions.elasticity = 1.0;
+//        _animationOptions.resistance = 0.5;
+//        _animationOptions.friction = 0.5;
+//        _animationOptions.density = 1.0;
+        
     }
     return _animationOptions;
 }
